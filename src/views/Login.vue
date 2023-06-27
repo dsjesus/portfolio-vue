@@ -28,7 +28,7 @@
           ></v-text-field>
         </v-card-text>
         <v-card-actions class="d-flex justify-end pt-0">
-          <v-btn :loading="loading" type="submit" variant="flat" color="blue-darken-3">Login</v-btn>
+          <v-btn :disabled="singInButtonDisable" :loading="loading" type="submit" variant="flat" color="blue-darken-3">Login</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -37,28 +37,32 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-//@ts-ignore
 import { authUser } from '@/repository/AuthRepository'
 import { useAlertsStore } from '@/stores'
 import { useRouter } from 'vue-router'
+import {computed} from "vue"
 
 const router = useRouter()
-
 const store = useAlertsStore()
 const { openAlert } = store
 const userData = ref({
-  username: '',
-  password: ''
+  username: "",
+  password: ""
 })
 const loading = ref(false)
 const form = ref<HTMLFormElement>()
+
+const singInButtonDisable = computed(() => {
+      return userData.value.username <= 0 || userData.value.password <= 0 || !form;
+})
+
 async function login(event: any) {
   const { valid } = await form.value?.validate()
   loading.value = true
   authUser(userData.value.username, userData.value.password)
     .then((res: any) => {
       openAlert(res.data.message, 'success')
-      router.push({name: "home"})
+      router.push({ name: 'home' })
     })
     .catch((error) => {
       openAlert(error.data.message, 'error')
