@@ -2,7 +2,7 @@
   <div class="text-center">
     <v-dialog v-model="dialog" width="800" persistent>
       <v-card>
-        <v-card-title class="bg-blue-darken-3">Registrar/Editar Empresa</v-card-title>
+        <v-card-title class="bg-blue-darken-3">Registrar</v-card-title>
         <v-tabs v-model="tab" color="blue-darken-3">
           <v-tab value="one">
             <v-icon size="x-large" icon="mdi-account-details"></v-icon>
@@ -17,7 +17,7 @@
         <v-form ref="form" @submit.prevent="save">
           <div class="d-flex ma-3">
             <v-combobox
-              v-model="status"
+              v-model="company.status"
               :rules="[rules.required]"
               required
               :items="['Ativo', 'Suspenso', 'Fechado', 'Bloqueado']"
@@ -25,7 +25,7 @@
               placeholder="Status"
             ></v-combobox>
             <v-text-field
-              v-model="cnpj"
+              v-model="company.cnpj"
               :rules="[rules.required]"
               required
               class="ml-3"
@@ -35,14 +35,14 @@
           </div>
           <div class="d-flex mx-3">
             <v-text-field
-              v-model="razaoSocial"
+              v-model="company.corporateName"
               :rules="[rules.required]"
               required
               variant="outlined"
               placeholder="Razão Social"
             ></v-text-field>
             <v-text-field
-              v-model="nameFantasia"
+              v-model="company.fantasyName"
               :rules="[rules.required]"
               required
               class="ml-3"
@@ -51,7 +51,7 @@
             ></v-text-field>
           </div>
           <v-combobox
-            v-model="groupCompany"
+            v-model="company.groupCompany"
             :rules="[rules.required]"
             required
             :items="['A', 'B', 'C', 'D']"
@@ -76,6 +76,9 @@
 import { useAlertsStore } from '@/stores'
 import { computed } from 'vue'
 import { ref } from 'vue'
+import { useCompanyStore } from '@/stores'
+
+const companyStore = useCompanyStore()
 
 const store = useAlertsStore()
 const { openAlert } = store
@@ -84,11 +87,11 @@ const emit = defineEmits(['value'])
 const props = defineProps(['value'])
 const singInButtonDisable = computed(() => {
   return (
-    status.value <= 0 ||
-    cnpj.value <= 0 ||
-    razaoSocial.value <= 0 ||
-    nameFantasia.value <= 0 ||
-    groupCompany.value <= 0 ||
+    company.value.status <= 0 ||
+    company.value.cnpj <= 0 ||
+    company.value.corporateName <= 0 ||
+    company.value.fantasyName <= 0 ||
+    company.value.groupCompany <= 0 ||
     !form
   )
 })
@@ -100,11 +103,15 @@ const dialog = computed({
     emit('value', currentValue)
   }
 })
-let status = ref()
-let cnpj = ref()
-let razaoSocial = ref()
-let nameFantasia = ref()
-let groupCompany = ref()
+
+const company = ref({
+  status: '',
+  cnpj: '',
+  corporateName: '',
+  fantasyName: '',
+  groupCompany: ''
+})
+
 const tab = ref(null)
 const form = ref<HTMLFormElement>()
 const rules = {
@@ -114,11 +121,7 @@ const rules = {
 async function save(event: any) {
   const { valid } = await form.value?.validate()
   openSanck()
-  status.value = ''
-  cnpj.value = ''
-  razaoSocial.value = ''
-  nameFantasia.value = ''
-  groupCompany.value = ''
+  companyStore.createCompany(company.value)
   dialog.value = false
 }
 
