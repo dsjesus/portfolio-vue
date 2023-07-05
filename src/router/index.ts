@@ -25,6 +25,11 @@ const router = createRouter({
       }
     },
     {
+      path: "/createDataTable",
+      name: "dataTable",
+      component: () => import('@/components/DataTableCompany.vue')
+    },
+    {
       path: '/',
       redirect: '*'
     }
