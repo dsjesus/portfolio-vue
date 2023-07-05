@@ -18,7 +18,7 @@
             <v-list-item v-bind="props" prepend-icon="mdi-account" title="Cadastro"> </v-list-item>
           </template>
           <v-list-item
-            @click="dialog = true"
+            @click="changeView"
             value="RegisterCompany"
             class="py-0"
             title="Cadastro de Empresa"
@@ -71,9 +71,14 @@
 </template>
 <script setup lang="ts">
 import dialogCompany from '@/components/DialogCreateCompany.vue'
+import router from '@/router';
 import { ref } from 'vue'
 
 const dialog = ref(false)
 const drawer = ref()
 const order = ref(0)
+
+function changeView() {
+  router.push("/createDataTable")
+}
 </script>
